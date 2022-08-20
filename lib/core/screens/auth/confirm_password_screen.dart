@@ -209,6 +209,7 @@ class _ConfirmPasswordScreenState extends State<ConfirmPasswordScreen> {
                     ),
                   ),
                   onPressed: () {
+                    changePassword();
                     Navigator.pushNamed(context, '/update_password');
                   },
                   style: ButtonStyle(
@@ -226,4 +227,6 @@ class _ConfirmPasswordScreenState extends State<ConfirmPasswordScreen> {
       ),
     );
   }
+
+  void changePassword() {}
 }
