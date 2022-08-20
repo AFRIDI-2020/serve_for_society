@@ -1,26 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:volunteer_project/core/services/providers/auth_provider.dart';
 import 'package:volunteer_project/utils/theme.dart';
+import '../../models/user.dart';
 
 class NumbersWidget extends StatelessWidget {
+  const NumbersWidget({Key? key}) : super(key: key);
+
   @override
-  Widget build(BuildContext context) => Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: <Widget>[
-      buildButton(context, '5', 'Joined'),
-      buildDivider(),
-      buildButton(context, '3', 'Completed'),
-      buildDivider(),
-      buildButton(context, '2', 'Pending'),
-    ],
-  );
-  Widget buildDivider() => Container(
+  Widget build(BuildContext context){
+    User user = Provider.of<AuthProvider>(context).currentUser;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        buildButton(context, user.joinedEvents.length.toString(), 'Joined'),
+        buildDivider(),
+        buildButton(context, user.completedEvents.length.toString(), 'Completed'),
+        buildDivider(),
+        buildButton(context, (user.joinedEvents.length - user.completedEvents.length).toString(), 'Pending'),
+      ],
+    );
+  }
+  Widget buildDivider() => const SizedBox(
     height: 24,
     child: VerticalDivider(),
   );
 
   Widget buildButton(BuildContext context, String value, String text) =>
       MaterialButton(
-        padding: EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.symmetric(vertical: 4),
         onPressed: () {},
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         child: Column(
@@ -31,10 +39,10 @@ class NumbersWidget extends StatelessWidget {
               value,
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24,color: darkGreen),
             ),
-            SizedBox(height: 2),
+            const SizedBox(height: 2),
             Text(
               text,
-              style: TextStyle(fontWeight: FontWeight.normal),
+              style: const TextStyle(fontWeight: FontWeight.normal),
             ),
           ],
         ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 const Color appThemeColor = Colors.green;
 const Color textColor = Colors.black;
 const Color hintTextColor = Colors.grey;
+const Color whiteTextColor = Colors.white;
 Color circleAvaterBgColor = Colors.grey.shade100;
 Color screenBgColor = Colors.grey.shade300;
 Color darkGreen = Colors.green.shade900;

@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:volunteer_project/core/components/custom_text.dart';
 import 'package:volunteer_project/core/components/drawer.dart';
+import 'package:volunteer_project/core/services/providers/auth_provider.dart';
+import 'package:volunteer_project/utils/strings.dart';
 import 'bottom_nav_bar_screens/event/create_event_nav_scr.dart';
 import 'bottom_nav_bar_screens/chat/chat_nav_scr.dart';
-import 'package:volunteer_project/core/screens/bottom_nav_bar_screens/home_nav_scr.dart';
+import 'bottom_nav_bar_screens/home/home_nav_scr.dart';
 import 'package:volunteer_project/utils/theme.dart';
 
 class HomePage extends StatefulWidget {
-  int pageIndex;
-  HomePage({Key? key, required this.pageIndex}) : super(key: key);
+  final int pageIndex;
+  const HomePage({Key? key, required this.pageIndex}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -17,16 +21,22 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   final _pageController = PageController();
-  GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
-  final navPages = [HomeNavScr(), ChatNavScr(), CreateEventNavScr()];
+  final navPages = [const HomeNavScr(), const ChatNavScr(), const CreateEventNavScr()];
 
   @override
   void initState() {
+    super.initState();
     setState(() {
       _selectedIndex = widget.pageIndex;
     });
-    super.initState();
+    getUserDetails();
+  }
+
+  getUserDetails() async {
+    final prefs = await SharedPreferences.getInstance();
+    await Provider.of<AuthProvider>(context, listen: false).getCurrentUserDetails(prefs.getString(Strings.dbUserId)!);
   }
 
   @override
@@ -47,12 +57,19 @@ class _HomePageState extends State<HomePage> {
             },
             icon: const Icon(Icons.menu)),
         title: customText(
-            _selectedIndex == 0? 'Home': _selectedIndex == 1? 'Chat' : 'Create Event', Colors.white, FontSize.largeFont, FontWeight.w500),
+            _selectedIndex == 0
+                ? 'Home'
+                : _selectedIndex == 1
+                    ? 'Chat'
+                    : 'Create Event',
+            Colors.white,
+            FontSize.largeFont,
+            FontWeight.w500),
         actions: [
           IconButton(onPressed: () {}, icon: const Icon(Icons.search)),
         ],
       ),
-      drawer: customDrawer(context),
+      drawer: const CustomDrawer(),
       bottomNavigationBar: BottomNavigationBar(
         selectedItemColor: darkGreen,
         currentIndex: _selectedIndex,
@@ -67,7 +84,8 @@ class _HomePageState extends State<HomePage> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
-          BottomNavigationBarItem(icon: Icon(Icons.add_circle_outline), label: 'Create Event'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.add_circle_outline), label: 'Create Event'),
         ],
       ),
       body: PageView(

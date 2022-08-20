@@ -1,8 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:volunteer_project/core/components/dummy_text.dart';
 import 'package:volunteer_project/core/screens/profile/numbers_widget.dart';
-import 'package:volunteer_project/utils/theme.dart';
+import 'package:volunteer_project/core/services/providers/auth_provider.dart';
+import 'package:volunteer_project/utils/strings.dart';
+import '../../models/user.dart';
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
@@ -14,22 +16,20 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
-
+    final authProvider = Provider.of<AuthProvider>(context);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(onPressed: (){
-          Navigator.pop(context);
-        }, icon: const Icon(Icons.arrow_back, color: Colors.black,)),
-        actions: [
-          IconButton(onPressed: (){
-          }, icon: const Icon(
-            Icons.edit,
-            color: Colors.black,
-          ),)
-        ],
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Colors.black,
+            )),
       ),
       body: ListView(
         physics: const BouncingScrollPhysics(),
@@ -38,41 +38,20 @@ class _ProfileState extends State<Profile> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                   CircleAvatar(
-                    backgroundColor: Colors.grey.shade200,
-                    backgroundImage: const AssetImage('assets/profile_image_demo.png'),
-                    radius: 50,
-                  ),
-                  Positioned(
-                      bottom: 5,
-                      right: 5,
-                      child: GestureDetector(
-                        onTap: () async {
-
-                        },
-                        child: Container(
-                            decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.grey.shade700),
-                            padding: const EdgeInsets.all(5),
-                            child: const Icon(
-                              Icons.camera_alt_outlined,
-                              color: Colors.white,
-                              size: 20,
-                            )),
-                      ))
-                ],
+              CircleAvatar(
+                backgroundColor: Colors.grey.shade200,
+                backgroundImage: authProvider.currentUser.profileImage != ''
+                    ? NetworkImage(authProvider.currentUser.profileImage)
+                    : const AssetImage('assets/profile_image_demo.png')
+                        as ImageProvider,
+                radius: 60,
               ),
             ],
           ),
           const SizedBox(height: 20),
           buildName(),
-
           const SizedBox(height: 20),
-          NumbersWidget(),
+          const NumbersWidget(),
           const SizedBox(height: 30),
           buildAbout(),
         ],
@@ -80,35 +59,42 @@ class _ProfileState extends State<Profile> {
     );
   }
 
-  Widget buildName() => Column(
-    children:  [
-      Text(
-        'Rober James',
-        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24, color: Colors.black),
-      ),
-      const SizedBox(height: 4),
-      const Text(
-        '01782349745',
-        style: TextStyle(color: Colors.grey),
-      )
-    ],
-  );
-
-  Widget buildAbout() => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 48),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
+  Widget buildName() {
+    User user = Provider.of<AuthProvider>(context).currentUser;
+    return Column(
+      children: [
         Text(
-          'About',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          user.username,
+          style: const TextStyle(
+              fontWeight: FontWeight.bold, fontSize: 24, color: Colors.black),
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 4),
         Text(
-          dummyText,
-          style: TextStyle(fontSize: 16, height: 1.4),
-        ),
+          user.mobileNo,
+          style: const TextStyle(color: Colors.grey),
+        )
       ],
-    ),
-  );
+    );
+  }
+
+  Widget buildAbout() {
+    User user = Provider.of<AuthProvider>(context).currentUser;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 48),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'About',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            user.aboutUser == '' ? Strings.nothingAddedYet : user.aboutUser,
+            style: const TextStyle(fontSize: 16, height: 1.4),
+          ),
+        ],
+      ),
+    );
+  }
 }

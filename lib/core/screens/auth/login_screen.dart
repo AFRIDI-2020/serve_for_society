@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:volunteer_project/core/components/TextFieldBuilder.dart';
-import 'package:volunteer_project/core/screens/auth/forgot_password_screen.dart';
+import 'package:volunteer_project/core/components/TextFieldValidation.dart';
 import 'package:volunteer_project/core/screens/auth/register_screen.dart';
+import 'package:volunteer_project/core/services/providers/auth_provider.dart';
+import 'package:volunteer_project/utils/strings.dart';
 import 'package:volunteer_project/utils/theme.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -12,15 +16,17 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _mobileNoController = TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   String? _mobileNoErrorText;
   String? _passwordErrorText;
   bool obscureText = true;
+  bool loading = false;
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: darkGreen,
@@ -29,14 +35,14 @@ class _LoginScreenState extends State<LoginScreen> {
         elevation: 0.0,
         automaticallyImplyLeading: false,
         title: const Text(
-          'Login',
+          Strings.login,
         ),
       ),
-      body: _bodyUI(context),
+      body: _bodyUI(context, authProvider),
     );
   }
 
-  Widget _bodyUI(BuildContext context) {
+  Widget _bodyUI(BuildContext context, AuthProvider authProvider) {
     Size size = MediaQuery.of(context).size;
     return SafeArea(
       child: Stack(
@@ -54,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Serve for Society',
+                        Strings.serveForSociety,
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: size.width * .1,
@@ -66,15 +72,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         children: [
                           SizedBox(width: size.width * .03),
                           Text(
-                            'One Step For Our Selves',
+                            Strings.oneStepForOurSociety,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: size.width * .045,
                             ),
                           ),
-                          SizedBox(width: size.width * .03),
-                          // Icon(FontAwesomeIcons.paw,
-                          //     size: size.width * .04, color: Colors.white),
+                          SizedBox(width: size.width * .03)
                         ],
                       )
                     ],
@@ -103,7 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       padding: EdgeInsets.fromLTRB(
                           size.width * .05, size.width * .15, 0.0, 0.0),
                       child: Text(
-                        'Login',
+                        Strings.login,
                         style: TextStyle(
                           color: darkGreen,
                           fontSize: size.width * .06,
@@ -115,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       padding: EdgeInsets.fromLTRB(
                           size.width * .05, size.width * .02, 0.0, 0.0),
                       child: Text(
-                        'Get logged in for better experience',
+                        Strings.loginScreenSubTitle,
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: size.width * .032,
@@ -128,12 +132,17 @@ class _LoginScreenState extends State<LoginScreen> {
                           size.width * .05, 20.0, size.width * .05, 0.0),
                       child: TextFieldBuilder().showtextFormBuilder(
                           context,
-                          'Mobile number',
-                          Icons.phone_android_outlined,
-                          _mobileNoController,
+                          Strings.username,
+                          Icons.person,
+                          usernameController,
                           _mobileNoErrorText,
                           false,
-                          null),
+                          null,
+                          textInputType: TextInputType.text,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(
+                                RegExp("[a-z.A-Z0-9_-]")),
+                          ]),
                     ),
                     Container(
                       width: size.width,
@@ -157,31 +166,36 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ? Icons.visibility
                                     : Icons.visibility_off,
                                 color: darkGreen,
-                              ))),
+                              )),
+                          textInputType: TextInputType.visiblePassword),
                     ),
-                    InkWell(
-                      onTap: (){
-                        Navigator.pushNamed(context, '/home_page');
-                      },
-                      child: Container(
-                        height: 45,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: darkGreen
-                        ),
-                        margin: EdgeInsets.fromLTRB(
-                            size.width * .05, 20.0, size.width * .05, 0.0),
-                        alignment: Alignment.center,
-                        child: Text(
-                          'LOG IN',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: size.width * .04,
-                            fontWeight: FontWeight.bold,
+                    loading
+                        ? const Padding(
+                          padding: EdgeInsets.only(top: 10),
+                          child: Center(child: CircularProgressIndicator()),
+                        )
+                        : InkWell(
+                            onTap: () {
+                              login(authProvider);
+                            },
+                            child: Container(
+                              height: 45,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: darkGreen),
+                              margin: EdgeInsets.fromLTRB(size.width * .05,
+                                  20.0, size.width * .05, 0.0),
+                              alignment: Alignment.center,
+                              child: Text(
+                                'LOG IN',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: size.width * .04,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
                     Container(
                         alignment: Alignment.centerRight,
                         padding: EdgeInsets.only(right: size.width * .04),
@@ -246,5 +260,36 @@ class _LoginScreenState extends State<LoginScreen> {
         ],
       ),
     );
+  }
+
+  void login(AuthProvider authProvider) async {
+    if (!TextFieldValidation().usernameValidation(usernameController.text)) {
+      setState(() {
+        _mobileNoErrorText = Strings.usernameRequired;
+      });
+      return;
+    } else {
+      setState(() {
+        _mobileNoErrorText = null;
+      });
+    }
+    if (!TextFieldValidation().passwordValidation(_passwordController.text)) {
+      setState(() {
+        _passwordErrorText = 'Password must be of at least 6 digits!';
+      });
+      return;
+    } else {
+      setState(() {
+        _passwordErrorText = null;
+      });
+    }
+    setState(() {
+      loading = true;
+    });
+    await authProvider.login(
+        usernameController.text, _passwordController.text, context);
+    setState(() {
+      loading = false;
+    });
   }
 }

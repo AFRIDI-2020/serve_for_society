@@ -1,15 +1,22 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:intl/intl.dart';
 import 'package:volunteer_project/core/components/custom_text.dart';
 import 'package:volunteer_project/core/components/dummy_text.dart';
+import 'package:volunteer_project/core/models/review.dart';
 import 'package:volunteer_project/utils/theme.dart';
 
 class FeedbackItem extends StatelessWidget {
-  const FeedbackItem({Key? key}) : super(key: key);
+  final Review review;
+
+  const FeedbackItem({Key? key, required this.review}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    String reviewTime = DateFormat.yMMMd().add_jm().format(
+        DateTime.fromMillisecondsSinceEpoch(int.parse("1660276083033")));
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 15),
       child: Column(
@@ -18,9 +25,11 @@ class FeedbackItem extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const CircleAvatar(
+               CircleAvatar(
                 radius: 20,
-                backgroundImage: AssetImage('assets/profile_image_demo.png'),
+                backgroundImage: review.createdBy!.profileImage != ''
+                    ? CachedNetworkImageProvider(review.createdBy!.profileImage)
+                    : const AssetImage('assets/profile_image_demo.png') as ImageProvider,
               ),
               const SizedBox(
                 width: 20,
@@ -29,10 +38,10 @@ class FeedbackItem extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    customText('Rober James', Colors.white,
+                    customText(review.createdBy!.username, Colors.white,
                         FontSize.mediumFont, FontWeight.w500),
                     const SizedBox(height: 3),
-                    customText('March 18, 2022 6:45 pm', Colors.grey.shade400,
+                    customText(reviewTime, Colors.grey.shade400,
                         FontSize.smallFont, FontWeight.normal),
                   ],
                 ),
@@ -41,21 +50,19 @@ class FeedbackItem extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           ExpandableText(
-            dummyText,
+            review.reviewMessage,
             expandText: 'show more',
             collapseText: 'show less',
             maxLines: 5,
             linkColor: Colors.green,
-            style: TextStyle(
-                color: Colors.grey.shade300
-            ),
+            style: TextStyle(color: Colors.grey.shade300),
           ),
           const SizedBox(height: 10),
           RatingBar(
             ignoreGestures: true,
             glowColor: Colors.white,
             unratedColor: Colors.grey,
-            initialRating: 2.5,
+            initialRating: review.rating,
             direction: Axis.horizontal,
             allowHalfRating: true,
             itemCount: 5,

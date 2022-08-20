@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:volunteer_project/core/components/custom_text.dart';
+import 'package:volunteer_project/core/models/user.dart';
+import 'package:volunteer_project/core/services/providers/auth_provider.dart';
 import 'package:volunteer_project/utils/theme.dart';
 
-Drawer customDrawer(context) => Drawer(
+class CustomDrawer extends StatelessWidget {
+  const CustomDrawer({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    return Drawer(
       child: ListView(
         children: [
           DrawerHeader(
@@ -17,30 +26,19 @@ Drawer customDrawer(context) => Drawer(
                     radius: 50,
                     backgroundColor: circleAvaterBgColor,
                     backgroundImage:
-                        const AssetImage('assets/profile_image_demo.png'),
+                    authProvider.currentUser.profileImage != ''
+                        ? NetworkImage(authProvider.currentUser.profileImage)
+                        : const AssetImage('assets/profile_image_demo.png')
+                    as ImageProvider,
                   ),
                   const SizedBox(width: 20),
                   Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          'Rober James',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: FontSize.largeFont,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 5),
-                        Text(
-                          '01782349745',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      authProvider.currentUser.username,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: FontSize.largeFont,
+                          fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
@@ -59,7 +57,9 @@ Drawer customDrawer(context) => Drawer(
             ),
           ),
           ListTile(
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, '/edit_profile');
+            },
             title: customText('Edit Profile', Colors.black, FontSize.mediumFont,
                 FontWeight.w500),
             leading: const Icon(
@@ -83,8 +83,8 @@ Drawer customDrawer(context) => Drawer(
             ),
           ),
           ListTile(
-            onTap: () async {
-              Navigator.pushNamed(context, '/');
+            onTap: () {
+              logout(authProvider, context);
             },
             title: customText(
                 'Log out', Colors.black, FontSize.mediumFont, FontWeight.w500),
@@ -95,3 +95,11 @@ Drawer customDrawer(context) => Drawer(
         ],
       ),
     );
+  }
+}
+
+
+void logout(AuthProvider authProvider, context) async {
+  await authProvider.logout();
+  Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+}

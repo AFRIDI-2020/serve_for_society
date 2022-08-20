@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:volunteer_project/core/components/TextFieldBuilder.dart';
 import 'package:volunteer_project/core/components/TextFieldValidation.dart';
+import 'package:volunteer_project/core/components/show_toast.dart';
+import 'package:volunteer_project/core/models/user_registration.dart';
+import 'package:volunteer_project/core/services/providers/auth_provider.dart';
+import 'package:volunteer_project/utils/my_encryption.dart';
 import 'package:volunteer_project/utils/theme.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -15,7 +21,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _mobileNoController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   String? _mobileNoErrorText;
   String? _usernameErrorText;
@@ -27,11 +34,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool confirmPasswordObscureText = true;
 
   DateTime now = DateTime.now();
+  bool loading = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: darkGreen,
         title: const Text(
@@ -51,6 +58,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Widget _bodyUI(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    final authProvider = Provider.of<AuthProvider>(context);
 
     return SizedBox(
         width: size.width,
@@ -142,7 +150,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 _usernameController,
                 _usernameErrorText,
                 false,
-                null),
+                null,
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp("[a-z.A-Z0-9_-]")),
+                ]
+            ),
           ),
           Container(
             width: size.width,
@@ -155,7 +167,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 _mobileNoController,
                 _mobileNoErrorText,
                 false,
-                null),
+                null,
+                textInputType: TextInputType.phone),
           ),
           Container(
             width: size.width,
@@ -224,64 +237,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
             height: size.width * .18,
             padding: EdgeInsets.fromLTRB(
                 size.width * .05, 20.0, size.width * .05, 0.0),
-            child: ElevatedButton(
-              onPressed: () {
-                // setState(() {
-                //   if (!TextFieldValidation()
-                //       .usernameValidation(_usernameController.text)) {
-                //     _usernameErrorText = 'Username is required!';
-                //     return;
-                //   } else {
-                //     _usernameErrorText = null;
-                //   }
-                //   if (!TextFieldValidation()
-                //       .mobileNoValidate(_mobileNoController.text)) {
-                //     _mobileNoErrorText = 'Invalid mobile number!';
-                //     return;
-                //   } else {
-                //     _mobileNoErrorText = null;
-                //   }
-                //   if (!TextFieldValidation()
-                //       .addressValidation(_addressController.text)) {
-                //     _addressErrorText = 'Address is required!';
-                //     return;
-                //   } else {
-                //     _addressErrorText = null;
-                //   }
-                //   if (!TextFieldValidation()
-                //       .passwordValidation(_passwordController.text)) {
-                //     _passwordErrorText =
-                //         'Password must be of at least 6 digits!';
-                //     return;
-                //   } else {
-                //     _passwordErrorText = null;
-                //   }
-                //   if (_confirmPasswordController.text !=
-                //       _passwordController.text) {
-                //     _confirmPasswordErrorText = 'Passwords does not match!';
-                //     return;
-                //   } else {
-                //     _confirmPasswordErrorText = null;
-                //   }
-                //   Navigator.pushNamed(context, '/home_page');
-                // });
-                Navigator.pushNamed(context, '/home_page');
-              },
-              child: Text(
-                'REGISTER',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: size.width * .04,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(darkGreen),
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ))),
-            ),
+            child: loading
+                ? const Center(child: CircularProgressIndicator())
+                : ElevatedButton(
+                    onPressed: () {
+                      register(authProvider);
+                    },
+                    child: Text(
+                      'REGISTER',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: size.width * .04,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(darkGreen),
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ))),
+                  ),
           ),
           Container(
             alignment: Alignment.bottomCenter,
@@ -317,5 +294,71 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           )
         ]));
+  }
+
+  void register(AuthProvider authProvider) async {
+    if (!TextFieldValidation().usernameValidation(_usernameController.text)) {
+      setState(() {
+        _usernameErrorText = 'Username is required!';
+      });
+      return;
+    } else {
+      setState(() {
+        _usernameErrorText = null;
+      });
+    }
+    if (!TextFieldValidation().mobileNoValidate(_mobileNoController.text)) {
+      setState(() {
+        _mobileNoErrorText = 'Invalid mobile number!';
+      });
+      return;
+    } else {
+      setState(() {
+        _mobileNoErrorText = null;
+      });
+    }
+    if (!TextFieldValidation().addressValidation(_addressController.text)) {
+      setState(() {
+        _addressErrorText = 'Address is required!';
+      });
+      return;
+    } else {
+      setState(() {
+        _addressErrorText = null;
+      });
+    }
+    if (!TextFieldValidation().passwordValidation(_passwordController.text)) {
+      setState(() {
+        _passwordErrorText = 'Password must be of at least 6 digits!';
+      });
+      return;
+    } else {
+      setState(() {
+        _passwordErrorText = null;
+      });
+    }
+    if (_confirmPasswordController.text != _passwordController.text) {
+      setState(() {
+        _confirmPasswordErrorText = 'Passwords does not match!';
+      });
+      return;
+    } else {
+      setState(() {
+        _confirmPasswordErrorText = null;
+      });
+    }
+    setState(() {
+      loading = true;
+    });
+    UserRegistration userRegistration = UserRegistration(
+        username: _usernameController.text,
+        mobileNo: _mobileNoController.text,
+        address: _addressController.text,
+        password: TextEncryption().encodeText(_passwordController.text));
+
+    await authProvider.registerUser(userRegistration, context);
+    setState(() {
+      loading = false;
+    });
   }
 }
