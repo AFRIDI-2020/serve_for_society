@@ -11,6 +11,7 @@ import 'package:volunteer_project/core/components/task_card.dart';
 import 'package:volunteer_project/core/models/event.dart';
 import 'package:volunteer_project/core/models/event_creator.dart';
 import 'package:volunteer_project/core/screens/bottom_nav_bar_screens/event/event_members.dart';
+import 'package:volunteer_project/core/screens/comments/comment_screen.dart';
 import 'package:volunteer_project/core/screens/feedbacks/feedback_screen.dart';
 import 'package:volunteer_project/core/services/providers/auth_provider.dart';
 import 'package:volunteer_project/core/services/providers/event_provider.dart';
@@ -76,48 +77,55 @@ class _EventDetailsState extends State<EventDetails> {
             }
 
             return Padding(
-              padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+              padding: EdgeInsets.only(top: MediaQuery
+                  .of(context)
+                  .padding
+                  .top),
               child: SingleChildScrollView(
                 child: Column(
                   children: [
                     SizedBox(
-                      width: MediaQuery.of(context).size.width,
+                      width: MediaQuery
+                          .of(context)
+                          .size
+                          .width,
                       height: 250,
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
                           getEvent(snapshot).image != ''
                               ? CachedNetworkImage(
-                                  imageUrl: getEvent(snapshot).image,
-                                  progressIndicatorBuilder:
-                                      (context, url, downloadProgress) => Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: const [
-                                      CircularProgressIndicator(),
-                                    ],
-                                  ),
-                                  errorWidget: (context, url, error) =>
-                                      const Icon(Icons.error),
-                                  height: 250,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                )
-                              : Container(
-                                  height: 250,
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-
-                                      gradient: LinearGradient(
-                                          begin: Alignment.topCenter,
-                                          end: Alignment.bottomCenter,
-                                          colors: [appThemeColor, darkGreen])),
-                                  alignment: Alignment.center,
-                                  child: Image.asset(
-                                    'assets/volunteering.png',
-                                    height: 50,
-                                    width: 50,
-                                  ),
+                            imageUrl: getEvent(snapshot).image,
+                            progressIndicatorBuilder:
+                                (context, url, downloadProgress) =>
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: const [
+                                    CircularProgressIndicator(),
+                                  ],
                                 ),
+                            errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
+                            height: 250,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          )
+                              : Container(
+                            height: 250,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+
+                                gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [appThemeColor, darkGreen])),
+                            alignment: Alignment.center,
+                            child: Image.asset(
+                              'assets/volunteering.png',
+                              height: 50,
+                              width: 50,
+                            ),
+                          ),
                           Positioned(
                             left: 15,
                             top: 15,
@@ -142,10 +150,13 @@ class _EventDetailsState extends State<EventDetails> {
                             bottom: 0,
                             child: Container(
                               alignment: Alignment.centerLeft,
-                              width: MediaQuery.of(context).size.width,
+                              width: MediaQuery
+                                  .of(context)
+                                  .size
+                                  .width,
                               color: Colors.black38,
                               padding:
-                                  const EdgeInsets.symmetric(horizontal: 15),
+                              const EdgeInsets.symmetric(horizontal: 15),
                               height: 36,
                               child: customText(
                                   getEvent(snapshot).address,
@@ -169,16 +180,16 @@ class _EventDetailsState extends State<EventDetails> {
                                 backgroundColor: circleAvaterBgColor,
                                 radius: 20,
                                 backgroundImage: getEvent(snapshot)
-                                            .createdBy!
-                                            .profileImage !=
-                                        ''
+                                    .createdBy!
+                                    .profileImage !=
+                                    ''
                                     ? CachedNetworkImageProvider(
-                                        getEvent(snapshot)
-                                            .createdBy!
-                                            .profileImage)
+                                    getEvent(snapshot)
+                                        .createdBy!
+                                        .profileImage)
                                     : const AssetImage(
-                                            'assets/profile_image_demo.png')
-                                        as ImageProvider,
+                                    'assets/profile_image_demo.png')
+                                as ImageProvider,
                               ),
                               const SizedBox(
                                 width: 20,
@@ -197,9 +208,9 @@ class _EventDetailsState extends State<EventDetails> {
                                         DateFormat("dd MMM yyyy")
                                             .add_jm()
                                             .format(DateTime
-                                                .fromMillisecondsSinceEpoch(
-                                                    int.parse(getEvent(snapshot)
-                                                        .createdAt))),
+                                            .fromMillisecondsSinceEpoch(
+                                            int.parse(getEvent(snapshot)
+                                                .createdAt))),
                                         Colors.black,
                                         FontSize.smallFont,
                                         FontWeight.normal),
@@ -212,7 +223,9 @@ class _EventDetailsState extends State<EventDetails> {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              EventMembers(members: getEvent(snapshot).members,)));
+                                              EventMembers(
+                                                members: getEvent(snapshot)
+                                                    .members,)));
                                 },
                                 child: SizedBox(
                                   width: 30,
@@ -254,30 +267,30 @@ class _EventDetailsState extends State<EventDetails> {
                               ),
                               isMember(getEvent(snapshot), authProvider)
                                   ? customText('Joined', darkGreen,
-                                      FontSize.mediumFont, FontWeight.bold)
+                                  FontSize.mediumFont, FontWeight.bold)
                                   : loading
-                                      ? const CircularProgressIndicator()
-                                      : SizedBox(
-                                          width: 60,
-                                          height: 24,
-                                          child: OutlinedButton(
-                                              style: OutlinedButton.styleFrom(
-                                                side: BorderSide(
-                                                    color: darkGreen),
-                                                padding: EdgeInsets.zero,
-                                              ),
-                                              onPressed: () {
-                                                joinEvent(
-                                                    eventProvider,
-                                                    authProvider,
-                                                    getEvent(snapshot));
-                                              },
-                                              child: customText(
-                                                  'Join',
-                                                  darkGreen,
-                                                  FontSize.mediumFont,
-                                                  FontWeight.w500)),
-                                        )
+                                  ? const CircularProgressIndicator()
+                                  : SizedBox(
+                                width: 60,
+                                height: 24,
+                                child: OutlinedButton(
+                                    style: OutlinedButton.styleFrom(
+                                      side: BorderSide(
+                                          color: darkGreen),
+                                      padding: EdgeInsets.zero,
+                                    ),
+                                    onPressed: () {
+                                      joinEvent(
+                                          eventProvider,
+                                          authProvider,
+                                          getEvent(snapshot));
+                                    },
+                                    child: customText(
+                                        'Join',
+                                        darkGreen,
+                                        FontSize.mediumFont,
+                                        FontWeight.w500)),
+                              )
                             ],
                           ),
                           const SizedBox(
@@ -304,7 +317,7 @@ class _EventDetailsState extends State<EventDetails> {
                             child: IntrinsicHeight(
                               child: Row(
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                MainAxisAlignment.spaceBetween,
                                 children: [
                                   Expanded(
                                     child: InkWell(
@@ -317,11 +330,11 @@ class _EventDetailsState extends State<EventDetails> {
                                             vertical: 5),
                                         child: Row(
                                           mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                          MainAxisAlignment.center,
                                           children: [
                                             Icon(
                                               hasAppreciated(getEvent(snapshot),
-                                                      authProvider)
+                                                  authProvider)
                                                   ? Icons.thumb_up
                                                   : Icons.thumb_up_alt_outlined,
                                               size: 20,
@@ -336,7 +349,8 @@ class _EventDetailsState extends State<EventDetails> {
                                                 FontSize.mediumFont,
                                                 FontWeight.normal),
                                             customText(
-                                                '(${getEvent(snapshot).appreciation.length})',
+                                                '(${getEvent(snapshot)
+                                                    .appreciation.length})',
                                                 Colors.black,
                                                 FontSize.smallFont,
                                                 FontWeight.w500),
@@ -352,32 +366,59 @@ class _EventDetailsState extends State<EventDetails> {
                                   ),
                                   Expanded(
                                     child: InkWell(
-                                      onTap: () {},
+                                      onTap: () {
+                                        Navigator.push(context, MaterialPageRoute(builder: (context) => CommentScreen(eventId: widget.eventId,)));
+                                      },
                                       child: Padding(
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 5),
                                         child: Row(
                                           mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                          MainAxisAlignment.center,
                                           children: [
-                                            Icon(
-                                              Icons.textsms_outlined,
-                                              size: 20,
-                                              color: darkGreen,
-                                            ),
-                                            const SizedBox(
-                                              width: 10,
-                                            ),
-                                            customText(
-                                                'Comments ',
-                                                Colors.black,
-                                                FontSize.mediumFont,
-                                                FontWeight.normal),
-                                            customText(
-                                                '(11)',
+                                          Icon(
+                                          Icons.textsms_outlined,
+                                          size: 20,
+                                          color: darkGreen,
+                                        ),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        customText(
+                                            'Comments ',
+                                            Colors.black,
+                                            FontSize.mediumFont,
+                                            FontWeight.normal),
+                                        StreamBuilder(
+                                          stream: FirebaseFirestore.instance
+                                              .collection('events')
+                                              .doc(widget.eventId)
+                                              .collection('comments')
+                                              .orderBy(
+                                              Strings.dbDate, descending: false)
+                                              .snapshots(),
+                                          builder: (context,
+                                              AsyncSnapshot<QuerySnapshot<Map<
+                                                  String,
+                                                  dynamic>>> snapshot) {
+                                            if (!snapshot.hasData) {
+                                              return Center(
+                                                child: customText(
+                                                    '(0)',
+                                                    Colors.black,
+                                                    FontSize.smallFont,
+                                                    FontWeight.w500),
+                                              );
+                                            }
+                                            int totalComment = snapshot.data!
+                                                .docs.length;
+                                            return customText(
+                                                '($totalComment)',
                                                 Colors.black,
                                                 FontSize.smallFont,
-                                                FontWeight.w500),
+                                                FontWeight.w500);
+                                          })
+
                                           ],
                                         ),
                                       ),
@@ -396,7 +437,9 @@ class _EventDetailsState extends State<EventDetails> {
                             height: 20,
                           ),
                           customText(
-                              'Event Tasks (${getCompletedTaskNumber(getEvent(snapshot))}/${getEvent(snapshot).tasks.length})',
+                              'Event Tasks (${getCompletedTaskNumber(
+                                  getEvent(snapshot))}/${getEvent(snapshot)
+                                  .tasks.length})',
                               Colors.black,
                               FontSize.mediumFont,
                               FontWeight.w500),
@@ -419,7 +462,8 @@ class _EventDetailsState extends State<EventDetails> {
                                     },
                                     child: TaskCard(
                                       eventId: getEvent(snapshot).eventId,
-                                      taskId: getEvent(snapshot).tasks[index][Strings.dbTaskId],
+                                      taskId: getEvent(snapshot)
+                                          .tasks[index][Strings.dbTaskId],
                                       backgroundColor: _tappedIndex == index
                                           ? darkGreen
                                           : Colors.white,
@@ -430,13 +474,17 @@ class _EventDetailsState extends State<EventDetails> {
                                       checkIconColor: _tappedIndex == index
                                           ? Colors.white
                                           : Colors.green,
-                                      isPostOwner: getEvent(snapshot).createdBy!.userId == authProvider.currentUser.userId? true: false,
+                                      isPostOwner: getEvent(snapshot).createdBy!
+                                          .userId ==
+                                          authProvider.currentUser.userId
+                                          ? true
+                                          : false,
                                       isCompleted:
-                                          getEvent(snapshot).tasks[index]
-                                                      [Strings.dbTaskStatus] ==
-                                                  Strings.pending
-                                              ? false
-                                              : true,
+                                      getEvent(snapshot).tasks[index]
+                                      [Strings.dbTaskStatus] ==
+                                          Strings.pending
+                                          ? false
+                                          : true,
                                     ));
                               },
                             ),
@@ -446,7 +494,7 @@ class _EventDetailsState extends State<EventDetails> {
                           ),
                           customText(
                               getEvent(snapshot).tasks[_tappedIndex]
-                                  [Strings.dbTaskDescription],
+                              [Strings.dbTaskDescription],
                               Colors.black,
                               FontSize.smallFont,
                               FontWeight.normal),
@@ -456,7 +504,8 @@ class _EventDetailsState extends State<EventDetails> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) =>
-                                          FeedbackScreen(eventId: widget.eventId,)));
+                                          FeedbackScreen(
+                                            eventId: widget.eventId,)));
                             },
                             child: Container(
                               decoration: BoxDecoration(
@@ -491,7 +540,7 @@ class _EventDetailsState extends State<EventDetails> {
         address: snapshot.data![Strings.dbCreatedBy][Strings.dbAddress],
         aboutUser: snapshot.data![Strings.dbCreatedBy][Strings.dbAboutUser],
         profileImage: snapshot.data![Strings.dbCreatedBy]
-            [Strings.dbProfileImage],
+        [Strings.dbProfileImage],
       ),
       description: snapshot.data![Strings.dbEventDescription],
       image: snapshot.data![Strings.dbEventImage],

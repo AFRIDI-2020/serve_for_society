@@ -36,7 +36,7 @@ class _EventMembersState extends State<EventMembers> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          searchMemberField(context),
+          //searchMemberField(context),
           SizedBox(
             height: size.width * .03,
           ),

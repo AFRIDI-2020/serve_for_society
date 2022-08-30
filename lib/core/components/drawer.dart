@@ -69,19 +69,19 @@ class CustomDrawer extends StatelessWidget {
               Icons.chevron_right,
             ),
           ),
-          ListTile(
-            onTap: () {
-              Navigator.pushNamed(context, '/confirm_password');
-            },
-            title: customText('Reset Password', Colors.black,
-                FontSize.mediumFont, FontWeight.w500),
-            leading: const Icon(
-              Icons.vpn_key_outlined,
-            ),
-            trailing: const Icon(
-              Icons.chevron_right,
-            ),
-          ),
+          // ListTile(
+          //   onTap: () {
+          //     Navigator.pushNamed(context, '/confirm_password');
+          //   },
+          //   title: customText('Reset Password', Colors.black,
+          //       FontSize.mediumFont, FontWeight.w500),
+          //   leading: const Icon(
+          //     Icons.vpn_key_outlined,
+          //   ),
+          //   trailing: const Icon(
+          //     Icons.chevron_right,
+          //   ),
+          // ),
           ListTile(
             onTap: () {
               logout(authProvider, context);

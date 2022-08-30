@@ -6,7 +6,6 @@ import 'package:volunteer_project/core/screens/auth/confirm_password_screen.dart
 import 'package:volunteer_project/core/screens/auth/forgot_password_screen.dart';
 import 'package:volunteer_project/core/screens/auth/login_screen.dart';
 import 'package:volunteer_project/core/screens/auth/update_password_screen.dart';
-import 'package:volunteer_project/core/screens/bottom_nav_bar_screens/event/event_details.dart';
 import 'package:volunteer_project/core/screens/home_page.dart';
 import 'package:volunteer_project/core/screens/profile/edit_profile.dart';
 import 'package:volunteer_project/core/screens/profile/profile.dart';
@@ -38,7 +37,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Volunteer app',
+        title: 'Serve for Society',
         theme: ThemeData(
           primarySwatch: Colors.green,
         ),

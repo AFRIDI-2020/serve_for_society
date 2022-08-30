@@ -65,9 +65,6 @@ class _HomePageState extends State<HomePage> {
             Colors.white,
             FontSize.largeFont,
             FontWeight.w500),
-        actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.search)),
-        ],
       ),
       drawer: const CustomDrawer(),
       bottomNavigationBar: BottomNavigationBar(

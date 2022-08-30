@@ -6,7 +6,7 @@ class Strings {
   static const String mobileNumber = "Mobile number";
   static const String username = "Username";
   static const String logout = "Logout";
-  static const String appName = "Volunteer";
+  static const String appName = "Serve for Society";
   static const String nothingAddedYet = "Nothing added yet!";
   static const String about = "About";
   static const String address = "Address";

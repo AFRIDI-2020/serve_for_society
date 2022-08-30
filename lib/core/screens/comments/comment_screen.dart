@@ -29,117 +29,120 @@ class _CommentScreenState extends State<CommentScreen> {
     final size = MediaQuery.of(context).size;
     final authProvider = Provider.of<AuthProvider>(context);
     final eventProvider = Provider.of<EventProvider>(context);
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: Colors.white,
+    return WillPopScope(
+      onWillPop: onWillPop,
+      child: Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.pop(context, totalComment);
+            },
           ),
-          onPressed: () {
-            Navigator.pop(context, totalComment);
-          },
+          title: customText(
+              'Comments', Colors.white, FontSize.largeFont, FontWeight.w500),
         ),
-        title: customText(
-            'Comments', Colors.white, FontSize.largeFont, FontWeight.w500),
-      ),
-      body: StreamBuilder(
-        stream: FirebaseFirestore.instance
-            .collection('events')
-            .doc(widget.eventId)
-            .collection('comments')
-            .orderBy(Strings.dbDate, descending: false)
-            .snapshots(),
-        builder: (context,
-            AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
-          if (!snapshot.hasData) {
-            return Center(
-              child: customText("No chat yet!", Colors.grey,
-                  FontSize.mediumFont, FontWeight.normal),
-            );
-          }
+        body: StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection('events')
+              .doc(widget.eventId)
+              .collection('comments')
+              .orderBy(Strings.dbDate, descending: false)
+              .snapshots(),
+          builder: (context,
+              AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+            if (!snapshot.hasData) {
+              return Center(
+                child: customText("No chat yet!", Colors.grey,
+                    FontSize.mediumFont, FontWeight.normal),
+              );
+            }
 
-          totalComment = snapshot.data!.docs.length;
+            totalComment = snapshot.data!.docs.length;
 
-          return Stack(
-            children: [
-              Padding(
-                  padding: EdgeInsets.all(size.width * .05),
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: snapshot.data!.docs.length,
-                    itemBuilder: (context, index) {
-                      var doc = snapshot.data!.docs[index];
-                      return notificationView(
-                          size,
-                          doc[Strings.dbComment],
-                          doc[Strings.dbCreatedBy][Strings.dbProfileImage],
-                          doc[Strings.dbDate]);
-                    },
-                  )),
-              Align(
-                alignment: Alignment.bottomLeft,
-                child: Container(
-                  padding: const EdgeInsets.only(left: 10, bottom: 10, top: 10),
-                  height: size.width * .17,
-                  alignment: Alignment.center,
-                  width: double.infinity,
-                  color: Colors.white,
-                  child: Row(
-                    children: <Widget>[
-                      SizedBox(
-                        width: size.width * .02,
-                      ),
-                      Expanded(
-                        child: TextFormField(
-                          cursorColor: Colors.black,
-                          controller: messageTextController,
-                          autocorrect: true,
-                          enableSuggestions: true,
-                          maxLines: 2,
-                          decoration: InputDecoration(
-                            hintText: 'Write here...',
-                            contentPadding: EdgeInsets.fromLTRB(
-                                size.width * .03, size.width * .06, 0.0, 0.0),
-                            border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.circular(size.width * .04),
-                                borderSide:
-                                    const BorderSide(color: Colors.grey)),
-                            focusedBorder: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.circular(size.width * .04),
-                                borderSide:
-                                    const BorderSide(color: Colors.grey)),
+            return Stack(
+              children: [
+                Padding(
+                    padding: EdgeInsets.all(size.width * .05),
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: snapshot.data!.docs.length,
+                      itemBuilder: (context, index) {
+                        var doc = snapshot.data!.docs[index];
+                        return notificationView(
+                            size,
+                            doc[Strings.dbComment],
+                            doc[Strings.dbCreatedBy][Strings.dbProfileImage],
+                            doc[Strings.dbDate]);
+                      },
+                    )),
+                Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Container(
+                    padding: const EdgeInsets.only(left: 10, bottom: 10, top: 10),
+                    height: size.width * .17,
+                    alignment: Alignment.center,
+                    width: double.infinity,
+                    color: Colors.white,
+                    child: Row(
+                      children: <Widget>[
+                        SizedBox(
+                          width: size.width * .02,
+                        ),
+                        Expanded(
+                          child: TextFormField(
+                            cursorColor: Colors.black,
+                            controller: messageTextController,
+                            autocorrect: true,
+                            enableSuggestions: true,
+                            maxLines: 2,
+                            decoration: InputDecoration(
+                              hintText: 'Write here...',
+                              contentPadding: EdgeInsets.fromLTRB(
+                                  size.width * .03, size.width * .06, 0.0, 0.0),
+                              border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(size.width * .04),
+                                  borderSide:
+                                      const BorderSide(color: Colors.grey)),
+                              focusedBorder: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(size.width * .04),
+                                  borderSide:
+                                      const BorderSide(color: Colors.grey)),
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(
-                        width: size.width * .04,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(right: size.width * .04),
-                        child: IconButton(
-                          onPressed: () {
-                            addComment(eventProvider, authProvider);
-                          },
-                          icon: Icon(
-                            Icons.send,
-                            color: Colors.green,
-                            size: size.width * .08,
-                          ),
-                          // backgroundColor: Colors.deepOrange,
-                          // elevation: 0,
+                        SizedBox(
+                          width: size.width * .04,
                         ),
-                      ),
-                    ],
+                        Padding(
+                          padding: EdgeInsets.only(right: size.width * .04),
+                          child: IconButton(
+                            onPressed: () {
+                              addComment(eventProvider, authProvider);
+                            },
+                            icon: Icon(
+                              Icons.send,
+                              color: Colors.green,
+                              size: size.width * .08,
+                            ),
+                            // backgroundColor: Colors.deepOrange,
+                            // elevation: 0,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
     );
   }
@@ -216,4 +219,9 @@ class _CommentScreenState extends State<CommentScreen> {
           ),
         ],
       );
+
+  Future<bool> onWillPop() async {
+    Navigator.pop(context, totalComment);
+    return true;
+  }
 }
